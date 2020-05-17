@@ -1,0 +1,38 @@
+<!DOCTYPE htlm>
+<html lang="en">
+    <head>
+        <title>RPA Wars</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" href="./images/Favicon.png" type="image/x-icon" />
+        <link async rel="stylesheet" href="./styles/site.css">
+        <script src="./scripts/starscape.js"></script>
+    </head>
+    <body>
+        <header id="header" class="header">
+            <a href="http:funtility.com" title="Funtility Home">
+                <img src="images/LogoRoundBevel_512.png">
+            </a>
+            <h2>
+                RPA Wars
+            </h2>
+        </header>
+        <main>
+            <div id="flyInLogo" class="fly-in-logo"></div>
+            <div class="bg-canvas">
+                <canvas id="starscape"></canvas>
+            </div>
+            <div id="content">
+                <div id="left" class="control left">Left control</div>
+                <div id="meme">MEME</div>
+                <div id="right" class="control right">Right control</div>
+            </div>
+        </main>
+        <footer>
+
+        </footer>
+    </body>
+    <script>
+        document.onload = initBgCanvas("starscape");
+    </script>
+</html>
