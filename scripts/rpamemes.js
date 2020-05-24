@@ -1,51 +1,66 @@
+let imgUrl = "./images/memes/";
+let audUrl = "./sounds/";
+
 let memes = [
         {
             "frames": [
                 {
-                    "url": "./images/memes/E1_Automate_them_all_of_them.png",
-                    "time": 0
+                    "aud": "",
+                    "img": "E1_Automate_them_all_of_them.png",
+                    "frameDuration": 3000
+                },{
+                    "aud": "tauntaun.wav",
+                    "img": "E1_Mesa_thinking_RPA.png",
+                    "frameDuration": 3000
                 }
             ]
         },{
             "frames": [
                 {
-                    "url": "./images/memes/E1_Want_to_be_a_bot_racer.png",
-                    "time": 0
+                    "aud": "",
+                    "img": "E1_Want_to_be_a_bot_racer.png",
+                    "frameDuration": 3000
                 }
             ]
         },{
             "frames": [
                 {
-                    "url": "./images/memes/E1_Mesa_thinking_RPA.png",
-                    "time": 0
+                    "aud": "",
+                    "img": "E1_Mesa_thinking_RPA.png",
+                    "frameDuration": 3000,
+                    "fade": 500,
                 }
             ]
         },{
             "frames": [
                 {
-                    "url": "./images/memes/E1_What_are_midichlorians.png",
-                    "time": 0
+                    "aud": "",
+                    "img": "E1_What_are_midichlorians.png",
+                    "frameDuration": 3000
                 }
             ]
         },{
             "frames": [
                 {
-                    "url": "./images/memes/E1_I_was_in_Flubber.png",
-                    "time": 0
+                    "aud": "",
+                    "img": "E1_I_was_in_Flubber.png",
+                    "frameDuration": 3000
                 }
             ]
         },{
             "frames": [
                 {
-                    "url": "./images/memes/E1_What_are_midichlorians.png",
-                    "time": 0
+                    "aud": "",
+                    "img": "E1_What_are_midichlorians.png",
+                    "frameDuration": 3000
                 }
             ]
         },{
             "frames": [
                 {
-                    "url": "./images/memes/E4_Enter_Mos_Eisley.png",
-                    "time": 0
+                    "aud": "",
+                    "img": "E4_Enter_Mos_Eisley.png",
+                    "frameDuration": 3000
                 }
             ]
         }

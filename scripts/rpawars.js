@@ -1,34 +1,50 @@
 var currentMemeIndex = 0;
-var currentDirection = "";
 var soundBite = null;
 var advancing = false;
 
-//#region Initialization
-
-var initBgCanvas = function(canvasId){
-    window.addEventListener('resize', function(){
-        resize();
-    })
-    initializePage(canvasId);
+var debug = function(msg){
+    console.log(msg);
 }
 
-var initializePage = function(canvasId){
+//#region Initialization
+
+var init = function(){
+    debug("init");
+    document.getElementById("header").style.marginTop = "-60";
     let content = document.getElementById("content");
-    content.setAttribute("style","opacity:0;");
-    resize();
-    introAnim(canvas);
-    initializeController();
+    content.style.opacity = 0;
+    
+    permission = document.getElementById("permission");
+    debug("permission");
+    permission.addEventListener("click", function(){
+        initializePage();
+    })
+}
+
+var initializePage = function(){
+    debug("initializePage");
+    permission = document.getElementById("permission");
+    permission.remove();
+    let content = document.getElementById("content");
+    content.style.opacity = 0;
+    flyInAnim();
     initializeMeme();
+    initializeController();
 }
 
 var initializeMeme = function() {
+    debug("initializeMeme");
     let count = memes.length;
     currentMemeIndex = Math.floor(Math.random() * count);
     let meme = document.getElementById("meme");
-    meme.setAttribute("style", "background:url(" + memes[currentMemeIndex].frames[0].url + ") no-repeat center;")
+    meme.removeAttribute("style");
+    meme.style.backgroundImage = "url(" + imgUrl + memes[currentMemeIndex].frames[0].img + ")";
+    meme.style.backgroundRepeat = "no-repeat";
+    meme.style.backgroundPosition = "center";
 }
 
 var initializeController = function(){
+    debug("initializeController");
     left = document.getElementById("left");
     right = document.getElementById("right");
     left.addEventListener('click', function(){advance("right");})
@@ -37,77 +53,35 @@ var initializeController = function(){
 
 //#endregion
 
-//#region Starscape
-
-var fillBlack = function(canvas,dims){
-    ctx = canvas.getContext('2d');
-    ctx.fillSyle = "(0,0,0)";
-    ctx.fillRect(0,0,dims[0],dims[1]);
-}
-
-var drawStars = function(canvas,dims){
-    area = dims[0] * dims [1];
-    count = Math.round(area * .005);
-    ctx = canvas.getContext('2d');
-    maxRadius = .95;
-    endAngle = 2 * Math.PI;
-    for(let i = 0; i < count; i++){
-        x = Math.floor(Math.random() * dims[0]);
-        y = Math.floor(Math.random() * dims[1]);
-        radius = (Math.random() * maxRadius);
-        ctx.beginPath();
-        ctx.fillStyle = fillStyle(radius,maxRadius);
-        ctx.arc(x,y,radius,0,endAngle,1);
-        ctx.fill();
-    }
-}
-
-var fillStyle = function(size, maxSize){
-    alpha = size/(maxSize*2);
-    if (alpha >= .48 ) {
-        chance = Math.random()
-        if (chance > .8 ) {
-            alpha = 1;
-            if (chance > .97){
-                return "RGBA(200,180,255,.8)";
-            }
-        }
-    }
-    return "RGBA(100,120,255," + alpha + ")";
-}
-
-//#endregion
-
 //#region Animations
 
-var introAnim = function(){
-    canvas = document.getElementById("starscape");
-    let dims = [
-        canvas.clientWidth,
-        canvas.clientHeight
-    ];
-
-    let header = document.getElementById("header");
-    let hdrMgnTp = -60;
-    header.setAttribute("style","margin-top:" + hdrMgnTp + "px;")
-
-    let flyIn = document.getElementById("flyInLogo");  
-    let styleBase = "width:" + (dims[0] - 10) + "px;height:" + (dims[1] - 10) + "px;";
-    
+var flyInAnim = function(){
+    debug("introAnim");
     let flyInSizePercent = 2;
     let step = .16;
     let ease = .918;
-    let opacity = 1;
+    let pcty = 1;
+
+    let flyIn = document.getElementById("flyIn");
+    let dims = [
+        flyIn.clientWidth,
+        flyIn.clientHeight
+    ];
+    flyIn.style.backgroundPosition = "center";
+    flyIn.style.backgroundRepeat = "no-repeat";
+    flyIn.style.backgroundSize = (dims[0] * flyInSizePercent) + "px " + (dims[1] * flyInSizePercent) + "px";
+    flyIn.style.backgroundImage = "url(./images/rpawars/RPAWarsFlyIn.svg)";
+    
     let introAnimId = setInterval(() => {
         if (flyInSizePercent > .06){
-            let bgs = "background-size:" + (dims[0] * flyInSizePercent) + "px " + (dims[1] * flyInSizePercent) + "px;";
             flyInSizePercent -= step;
             step = step * ease;
             if (flyInSizePercent < .5) {
-                opacity = opacity * .95
+                pcty = pcty * .95
+                flyIn.style.opacity = pcty;
             }
-            let ops = "opacity:" + opacity + ";";
-            flyIn.setAttribute("style",styleBase + bgs + ops);
+            
+            flyIn.style.backgroundSize = (dims[0] * flyInSizePercent) + "px " + (dims[1] * flyInSizePercent) + "px";
         }
         else {
             flyIn.remove();
@@ -121,65 +95,36 @@ var introAnim = function(){
 }
 
 var headerAnim = function(introAnimId){
+    debug("headerAnim");
     window.clearInterval(introAnimId);
     let header = document.getElementById("header");
     let hdrMgnTp = -60;
     let intId = setInterval(() => {
         if (hdrMgnTp <= -1){
             hdrMgnTp = hdrMgnTp * .85;
-            header.setAttribute("style","margin-top:" + hdrMgnTp + "px;");
+            header.style.marginTop = hdrMgnTp;
         }
         else{
+            header.removeAttribute("style");
             window.clearInterval(intId);
         }
     }, 50);
 }
 
 var controlsAnim = function(){
+    debug("controlsAnim");
     let content = document.getElementById("content");
     let opacity = .00001;
     let intId = setInterval(() => {
         if (opacity < 1){
             opacity += .03;
-            content.setAttribute("style","opacity:" + opacity + ";");
+            content.style.opacity = opacity;
         }
         else{
-            content.setAttribute("style","opacity:1;");
+            content.removeAttribute("style");
             window.clearInterval(intId);
         }
     }, 50);
-}
-
-//#endregion
-
-//#region Resize
-
-var resize = function() {
-    canvas = document.getElementById("starscape");
-    parent = canvas.parentElement;
-    dims = [
-        parent.clientWidth,
-        parent.clientHeight
-    ];
-    resizeMeme();
-    resizeCanvas(canvas,dims);
-    fillBlack(canvas,dims);
-    drawStars(canvas,dims);
-}
-
-var resizeCanvas = function(canvas,dims){
-    canvas.setAttribute("width",dims[0]);
-    canvas.setAttribute("height",dims[1]);
-}
-
-var resizeMeme = function(){
-    //console.log("resizeMeme");
-    content = document.getElementById("content");
-    // parent = content.parentElement;
-    // let width = parent.clientWidth *.8;
-    // let height = width * .4301821335646;
-    // meme = document.getElementById("meme");
-    // meme.setAttribute("style","background-size:" + width + "px " + height + "px;");
 }
 
 //#endregion
@@ -187,40 +132,37 @@ var resizeMeme = function(){
 //#region Meme controls
 
 var advance = function(direction){
+    debug("advance");
     if (!advancing){
         advancing = true;
+
         let current = document.getElementById("meme");
-        let width = current.clientWidth;
-        let cBg = "background:url(" + memes[currentMemeIndex].frames[0].url + ") no-repeat center;";
+        let parent = current.parentElement;
     
         getMeme(direction);
-        playSoundBite();
-        currentDirection = direction;
+        // playSoundBite();
     
         let next = document.createElement("div");
-        let nBg  = "background:url(" + memes[currentMemeIndex].frames[0].url + ") no-repeat center;";
-        next.setAttribute("style","opacity:0;");
-        next.setAttribute("id","meme");
+        next.style.backgroundRepeat = "no-repeat";
+        next.style.backgroundPosition = "center";
+        next.style.backgroundImage = "url(" + imgUrl + memes[currentMemeIndex].frames[0].img + ")";
+        next.style.opacity = 0;
+        next.id = "meme";
         next.classList.add("meme");
         
-        let parent = current.parentElement;
         parent.appendChild(next);
     
         let cPcty = 1;
         let nPcty = 0;
+        let step = .07;
         let intId = setInterval(() => {
             if (cPcty > 0){
-                cPcty -= .05;
-                cMargin = "margin-" + direction + ":-" + (width * nPcty) + ";";
-                cFade = "opacity:" + cPcty + ";";
-                current.setAttribute("style", cBg + cMargin + cFade);
+                current.style.opacity = cPcty;
+                cPcty -= step;
     
-                nPcty += .1;
-                nMargin = "margin-" + direction + ":" + (width * cPcty) + ";";
-                nFade = "opacity:" + nPcty + ";";
-                next.setAttribute("style", nBg + nMargin + nFade);
+                next.style.opacity = nPcty;
+                nPcty += step;
             } else {
-                next.setAttribute("style", nBg);
                 window.clearInterval(intId);
                 current.remove();
                 playMeme();
@@ -231,6 +173,7 @@ var advance = function(direction){
 }
 
 var getMeme = function(direction){
+    debug("getMeme");
     let count = memes.length;
     if (direction == "right"){
         if (currentMemeIndex == 0){ 
@@ -248,18 +191,31 @@ var getMeme = function(direction){
 }
 
 var playMeme = function(){
+    debug("playMeme");
     meme = memes[currentMemeIndex];
     let current = document.getElementById("meme");
-    let interval = 10;
+    current.style.backgroundRepeat = "no-repeat";
+    current.style.backgroundPosition = "center";
+    let interval = 20;
     let frameNum = 0;
     let count = 0;
+    let audioPlayed = false;
     let intId = setInterval(() => {
         if (frameNum < meme.frames.length){
-            let cBg = "background:url(" + meme.frames[frameNum].url + ") no-repeat center;";
-            current.setAttribute("style", cBg);
-            if (count < meme.frames[frameNum].time) {
+            current.style.backgroundImage = "url(" + imgUrl + meme.frames[frameNum].img + ")";
+
+
+            if (count < meme.frames[frameNum].frameDuration) {
+                console.log(frameNum + " frameDuration: " + meme.frames[frameNum].frameDuration);
+                if (!audioPlayed){
+                    audioPlayed = true;
+                    // console.log(JSON.stringify(meme));
+                    // console.log(meme.frames[frameNum].aud);
+                    playSoundBite(meme.frames[frameNum].aud);
+                }
                 count += interval;
             } else {
+                audioPlayed = false;
                 frameNum++;
                 count = 0;
             }
@@ -269,15 +225,17 @@ var playMeme = function(){
     }, interval)
 }
 
-var playSoundBite = function() {
-    randSound = Math.floor(Math.random() * sounds.length);
-    audioObj = new Audio(sounds[randSound].url);
-    let intId = setInterval(() => {
-        if (audioObj.HAVE_FUTURE_DATA) {
-            audioObj.play();
-            window.clearInterval(intId);
-        }
-    }, 10)
+var playSoundBite = function(fileName) {
+    debug("playSoundBite");
+    if (fileName !== ""){
+        audioObj = new Audio(audUrl + fileName);
+        let intId = setInterval(() => {
+            if (audioObj.HAVE_FUTURE_DATA) {
+                audioObj.play();
+                window.clearInterval(intId);
+            }
+        }, 10)
+    }
 }
 
 //#endregion

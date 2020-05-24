@@ -9,7 +9,7 @@
         <script src="./scripts/rpamemes.js"></script>
         <script src="./scripts/rpawars.js"></script>
     </head>
-    <body>
+    <body style="background-color: #000;">
         <header id="header" class="header">
             <a href="http:funtility.com" title="Funtility Home">
                 <img src="images/LogoRoundBevel_512.png">
@@ -19,21 +19,16 @@
             </h2>
         </header>
         <main>
-            <div id="flyInLogo" class="fly-in-logo"></div>
-            <div class="bg-canvas">
-                <canvas id="starscape"></canvas>
-            </div>
+            <div id="permission" class="permission"></div>
+            <div id="flyIn" class="fly-in"></div>
             <div id="content">
+                <div id="right" class="control right"></div>
                 <div id="left" class="control left"></div>
                 <div id="meme" class="meme"></div>
-                <div id="right" class="control right"></div>
             </div>
         </main>
-        <footer>
-
-        </footer>
     </body>
     <script>
-        document.onload = initBgCanvas("starscape");
+        document.onload = init();
     </script>
 </html>
