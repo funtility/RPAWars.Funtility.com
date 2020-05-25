@@ -7,10 +7,11 @@
 body {
     display: grid;
     grid-template-rows: auto auto auto;
-    background: url(../images/rpawars/stars.png) no-repeat center;
+    background-image: url(../images/rpawars/stars.png);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+    background-color: #000;
 }
 
 .hide {
@@ -93,7 +94,7 @@ main {
     left: 0;
 }
 
-.permission {
+#permission {
     position: fixed;
     z-index: 3;
     top: 0;
@@ -101,9 +102,11 @@ main {
     bottom: 0;
     left: 0;
     background: url(../images/rpawars/ClickToBegin.svg);
+    background-color: #000;
     background-position: center;
     background-repeat: no-repeat;
     background-size: 65%;
+    cursor: pointer;
 }
 
 #content {
@@ -135,6 +138,8 @@ main {
 .meme {
     grid-area: meme;
     background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .right {
@@ -149,4 +154,10 @@ main {
 .right:hover {
     opacity: .8;
     cursor: pointer;
+}
+
+#cache {
+    position: absolute;
+    z-index: -100;
+    top:50000;
 }

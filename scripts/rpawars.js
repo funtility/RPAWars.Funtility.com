@@ -1,6 +1,15 @@
-var currentMemeIndex = 0;
-var soundBite = null;
-var advancing = false;
+//#region Globals
+
+let currentMemeIndex = 0;
+let advancing = false;
+let intervalIds = [];
+let imgUrl = "./images/memes/";
+let audUrl = "./sounds/";
+let audioObj = new Audio();
+let content; // document.getElementById("content");
+let cache; // document.createElement("cache");
+
+////#endregion
 
 var debug = function(msg){
     console.log(msg);
@@ -11,52 +20,57 @@ var debug = function(msg){
 var init = function(){
     debug("init");
     document.getElementById("header").style.marginTop = "-60";
-    let content = document.getElementById("content");
+    content = document.getElementById("content");
     content.style.opacity = 0;
+    cache = document.getElementById("cache");
     
     permission = document.getElementById("permission");
-    debug("permission");
     permission.addEventListener("click", function(){
-        initializePage();
+        permission.remove();
+        startPage();
     })
+    setTimeout(() => {
+        preloadMeme(0);
+    }, 100);
 }
 
-var initializePage = function(){
-    debug("initializePage");
-    permission = document.getElementById("permission");
-    permission.remove();
-    let content = document.getElementById("content");
-    content.style.opacity = 0;
-    flyInAnim();
-    initializeMeme();
-    initializeController();
-}
-
-var initializeMeme = function() {
-    debug("initializeMeme");
-    let count = memes.length;
-    currentMemeIndex = Math.floor(Math.random() * count);
-    let meme = document.getElementById("meme");
-    meme.removeAttribute("style");
-    meme.style.backgroundImage = "url(" + imgUrl + memes[currentMemeIndex].frames[0].img + ")";
-    meme.style.backgroundRepeat = "no-repeat";
-    meme.style.backgroundPosition = "center";
-}
+// var initializeMeme = function() {
+//     debug("initializeMeme");
+//     let meme = document.getElementById("meme");
+//     meme.removeAttribute("style");
+//     meme.style.backgroundImage = "url(" + imgUrl + memes[currentMemeIndex].frames[0].img + ")";
+// }
 
 var initializeController = function(){
     debug("initializeController");
     left = document.getElementById("left");
     right = document.getElementById("right");
-    left.addEventListener('click', function(){advance("right");})
-    right.addEventListener('click', function(){advance("left");})
+    left.addEventListener('click', function(){
+        clearIntervals();
+        advance("right");
+    })
+    right.addEventListener('click', function(){
+        clearIntervals();
+        advance("left");
+    })
 }
 
 //#endregion
 
 //#region Animations
 
+var startPage = function(){
+    debug("startPage");
+    flyInAnim();
+    // initializeMeme();
+    initializeController();
+}
+
 var flyInAnim = function(){
     debug("introAnim");
+
+    //playSoundBite("ThemeClip.mp3");
+
     let flyInSizePercent = 2;
     let step = .16;
     let ease = .918;
@@ -72,7 +86,7 @@ var flyInAnim = function(){
     flyIn.style.backgroundSize = (dims[0] * flyInSizePercent) + "px " + (dims[1] * flyInSizePercent) + "px";
     flyIn.style.backgroundImage = "url(./images/rpawars/RPAWarsFlyIn.svg)";
     
-    let introAnimId = setInterval(() => {
+    let intId = setInterval(() => {
         if (flyInSizePercent > .06){
             flyInSizePercent -= step;
             step = step * ease;
@@ -85,18 +99,18 @@ var flyInAnim = function(){
         }
         else {
             flyIn.remove();
-            headerAnim(introAnimId);
+            window.clearInterval(intId);
+            headerAnim();
             controlsAnim();
-            setTimeout(() => {
-                playMeme();
-            }, 2000);
+            // setTimeout(() => {
+            //     playMeme();
+            // }, 2000);
         }
     }, 80);
 }
 
-var headerAnim = function(introAnimId){
+var headerAnim = function(){
     debug("headerAnim");
-    window.clearInterval(introAnimId);
     let header = document.getElementById("header");
     let hdrMgnTp = -60;
     let intId = setInterval(() => {
@@ -113,7 +127,6 @@ var headerAnim = function(introAnimId){
 
 var controlsAnim = function(){
     debug("controlsAnim");
-    let content = document.getElementById("content");
     let opacity = .00001;
     let intId = setInterval(() => {
         if (opacity < 1){
@@ -123,6 +136,7 @@ var controlsAnim = function(){
         else{
             content.removeAttribute("style");
             window.clearInterval(intId);
+            playMeme();
         }
     }, 50);
 }
@@ -131,48 +145,50 @@ var controlsAnim = function(){
 
 //#region Meme controls
 
-var advance = function(direction){
+var advance = function(direction, imgName = false){
     debug("advance");
     if (!advancing){
         advancing = true;
+        let nextMeme = false;
 
         let current = document.getElementById("meme");
-        let parent = current.parentElement;
-    
-        getMeme(direction);
-        // playSoundBite();
+        let step = .25;
+
+        if (!imgName){            
+            changeMemeIndex(direction);
+            imgName = memes[currentMemeIndex].frames[0].img;
+            step = .05;
+            nextMeme = true;
+        }
     
         let next = document.createElement("div");
-        next.style.backgroundRepeat = "no-repeat";
-        next.style.backgroundPosition = "center";
-        next.style.backgroundImage = "url(" + imgUrl + memes[currentMemeIndex].frames[0].img + ")";
+        // next.style.backgroundRepeat = "no-repeat";
+        // next.style.backgroundPosition = "center";
+        next.style.backgroundImage = "url(" + imgUrl + imgName + ")";
         next.style.opacity = 0;
         next.id = "meme";
         next.classList.add("meme");
         
-        parent.appendChild(next);
+        content.appendChild(next);
     
-        let cPcty = 1;
+        // let cPcty = 1;
         let nPcty = 0;
-        let step = .07;
-        let intId = setInterval(() => {
-            if (cPcty > 0){
-                current.style.opacity = cPcty;
-                cPcty -= step;
-    
+        let intId = setInterval(() => {        
+            if (nPcty < 0){    
                 next.style.opacity = nPcty;
                 nPcty += step;
             } else {
+                next.style.opacity = 1;
                 window.clearInterval(intId);
                 current.remove();
-                playMeme();
                 advancing = false;
+                if(nextMeme)playMeme();
             }
         }, 50)
     }
 }
 
-var getMeme = function(direction){
+var changeMemeIndex = function(direction){
     debug("getMeme");
     let count = memes.length;
     if (direction == "right"){
@@ -194,48 +210,96 @@ var playMeme = function(){
     debug("playMeme");
     meme = memes[currentMemeIndex];
     let current = document.getElementById("meme");
-    current.style.backgroundRepeat = "no-repeat";
-    current.style.backgroundPosition = "center";
+    // current.style.backgroundRepeat = "no-repeat";
+    // current.style.backgroundPosition = "center";
     let interval = 20;
     let frameNum = 0;
     let count = 0;
-    let audioPlayed = false;
-    let intId = setInterval(() => {
+    let setImage = true;
+    let playAud = true;
+    intervalIds.push(setInterval(() => {
         if (frameNum < meme.frames.length){
-            current.style.backgroundImage = "url(" + imgUrl + meme.frames[frameNum].img + ")";
+            if (setImage) {
+                debug("setting image");
+                if (frameNum > 0){
+                    advance(null, meme.frames[frameNum].img);
+                } else {
+                    current.style.backgroundImage = "url(" + imgUrl + meme.frames[frameNum].img + ")";
+                }
+                setImage = false;
+            }
 
-
-            if (count < meme.frames[frameNum].frameDuration) {
-                console.log(frameNum + " frameDuration: " + meme.frames[frameNum].frameDuration);
-                if (!audioPlayed){
-                    audioPlayed = true;
-                    // console.log(JSON.stringify(meme));
-                    // console.log(meme.frames[frameNum].aud);
+            if (count < meme.frames[frameNum].dur) {
+                debug(frameNum + " dur: " + meme.frames[frameNum].dur);
+                if (playAud){
+                    playAud = false;
                     playSoundBite(meme.frames[frameNum].aud);
+                    if (frameNum === meme.frames.length - 1 ) {
+                        clearIntervals();
+                    }
                 }
                 count += interval;
             } else {
-                audioPlayed = false;
+                setImage = true;
+                playAud = true;
                 frameNum++;
                 count = 0;
             }
         } else {
-            window.clearInterval(intId);
+            clearIntervals();
+            //window.clearInterval(intId);
         }
-    }, interval)
+    }, interval))
 }
 
 var playSoundBite = function(fileName) {
     debug("playSoundBite");
+    audioObj.pause();
     if (fileName !== ""){
         audioObj = new Audio(audUrl + fileName);
-        let intId = setInterval(() => {
-            if (audioObj.HAVE_FUTURE_DATA) {
-                audioObj.play();
-                window.clearInterval(intId);
-            }
-        }, 10)
+        if (audioObj.HAVE_FUTURE_DATA) {
+            audioObj.play();
+            //audioObj = null;
+        }
+        // let intId = setInterval(() => {
+        //     if (audioObj.HAVE_FUTURE_DATA) {
+        //         audioObj.play();
+        //         audioObj = null;
+        //         window.clearInterval(intId);
+        //     } else {
+        //         debug("clearing audioObj");
+        //     }
+        // }, 10)
     }
+}
+
+//#endregion
+
+//#region Resource management
+
+var preloadMeme = function(memeIndex) {
+    debug("preloadMeme");
+    let memeDiv = document.getElementById(memeIndex);
+    if (!memeDiv){
+        let meme = memes[memeIndex];
+        memeDiv = document.createElement("div");
+        memeDiv.id = memeIndex;
+        cache.appendChild(memeDiv);
+        for (let i = 0; i < meme.frames.length; i++){
+            let frameDiv = document.createElement("div");
+            frameDiv.classList.add("meme");
+            frameDiv.style.backgroundImage = "url(" + imgUrl + meme.frames[i].img + ")";
+            frameDiv.style.opacity = 0;
+            memeDiv.appendChild(frameDiv);
+        }
+    }
+}
+
+var clearIntervals = function(){
+    debug("clearIntervals");
+    let del = function(id) {window.clearInterval(id);}
+    intervalIds.forEach(id => del(id));
+    intervalIds = [];
 }
 
 //#endregion
